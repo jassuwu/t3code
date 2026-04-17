@@ -554,8 +554,8 @@ export function resolveMockUpdateServerUrl(mockUpdateServerPort: number | undefi
 
 export function resolveDesktopProductName(version: string): string {
   return resolveDesktopUpdateChannel(version) === "nightly"
-    ? "T3 Code (Nightly)"
-    : (desktopPackageJson.productName ?? "T3 Code");
+    ? "Jass Code (Nightly)"
+    : (desktopPackageJson.productName ?? "Jass Code");
 }
 
 const createBuildConfig = Effect.fn("createBuildConfig")(function* (

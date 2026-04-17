@@ -11,7 +11,15 @@ Personal tweaks on top of upstream `pingdotgg/t3code`. Living on the `personal` 
 
 ## Active tweaks
 
-- **[local] rename app to Jass Code** — changes `APP_BASE_NAME` in `apps/desktop/src/appBranding.ts`. Propagates to window title, dock name, About panel, and the web UI's injected branding (via `apps/web/src/branding.ts` reading `injectedDesktopAppBranding.baseName`). Test at `apps/desktop/src/appBranding.test.ts` updated to match.
+- **[local] rename app to Jass Code** — full rename across every user-visible surface:
+  - `apps/desktop/src/appBranding.ts` → runtime `APP_BASE_NAME` (About panel, Electron `app.getName()`)
+  - `apps/desktop/src/appBranding.test.ts` → test assertion updated
+  - `apps/desktop/package.json` → `productName` drives `CFBundleName` (macOS menu bar, Dock, bundle filename)
+  - `scripts/build-desktop-artifact.ts` → nightly hardcoded fallback and default
+  - `apps/web/index.html` → static `<title>` and splash screen aria-label/alt (what shows before JS runs)
+  - `apps/web/src/branding.ts` → fallback string for when branding isn't injected
+  - **Bundle filename changes** from `T3 Code (Alpha).app` to `Jass Code (Alpha).app`. The bundle ID (`com.t3tools.t3code`) and Electron userData path (`~/Library/Application Support/T3 Code (Alpha)`, legacy-detected) are unchanged — so your existing chats, settings, and secrets carry over with zero migration.
+  - **One-time cleanup on first install:** after running `install-local.sh`, remove the stale `/Applications/T3 Code (Alpha).app` manually: `rm -rf "/Applications/T3 Code (Alpha).app"`.
 
 <!--
 Example entry:

@@ -53,9 +53,12 @@ echo "→ Quitting running instance (if any)..."
 # Derive a likely process name from the bundle name (strip .app)
 PROC_NAME="${APP_NAME%.app}"
 osascript -e "tell application \"$PROC_NAME\" to quit" 2>/dev/null || true
+# Also try the upstream bundle name in case this is a rename transition
+osascript -e 'tell application "T3 Code (Alpha)" to quit' 2>/dev/null || true
 # Give it a beat to actually exit
 sleep 1
 pkill -f "$PROC_NAME" 2>/dev/null || true
+pkill -f "T3 Code" 2>/dev/null || true
 
 echo "→ Replacing installed app..."
 rm -rf "$INSTALLED_PATH"
