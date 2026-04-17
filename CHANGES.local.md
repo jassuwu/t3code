@@ -20,6 +20,9 @@ Personal tweaks on top of upstream `pingdotgg/t3code`. Living on the `personal` 
   - `apps/web/src/branding.ts` → fallback string for when branding isn't injected
   - **Bundle filename changes** from `T3 Code (Alpha).app` to `Jass Code (Alpha).app`. The bundle ID (`com.t3tools.t3code`) and Electron userData path (`~/Library/Application Support/T3 Code (Alpha)`, legacy-detected) are unchanged — so your existing chats, settings, and secrets carry over with zero migration.
   - **One-time cleanup on first install:** after running `install-local.sh`, remove the stale `/Applications/T3 Code (Alpha).app` manually: `rm -rf "/Applications/T3 Code (Alpha).app"`.
+  - Sidebar wordmark (`T3Wordmark` in `apps/web/src/components/Sidebar.tsx`) swapped from the T3 SVG glyph to a text span rendering "Jass".
+  - All remaining user-visible copy bulk-renamed "T3 Code" → "Jass Code" via sed across splash screen, settings panels, connection settings, desktop-update dialogs, server provider messages, CLI descriptions, and checkpoint git author. Generated dist files regenerate on next build. Tests updated to assert the new strings.
+  - **Preserved (do not change on rebase):** `LEGACY_USER_DATA_DIR_NAME` in `apps/desktop/src/main.ts` and the `~/.config/T3 Code (Alpha)` comment nearby — both keep existing userData working.
 
 <!--
 Example entry:

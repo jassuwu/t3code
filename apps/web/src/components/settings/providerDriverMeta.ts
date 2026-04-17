@@ -124,7 +124,7 @@ export const DRIVER_OPTIONS: readonly DriverOption[] = [
         key: "serverUrl",
         label: "Server URL",
         placeholder: "http://127.0.0.1:4096",
-        description: "Leave blank to let T3 Code spawn the server when needed.",
+        description: "Leave blank to let Jass Code spawn the server when needed.",
       },
       {
         key: "serverPassword",
