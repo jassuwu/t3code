@@ -52,10 +52,6 @@ echo
 echo "════════════════════════════════════════"
 echo " Step 2/2  Build + install"
 echo "════════════════════════════════════════"
-INSTALL_ARGS=()
-if [[ "$SKIP_BUILD" -eq 1 ]]; then
-  INSTALL_ARGS+=(--skip-build)
-fi
 if [[ "$SKIP_INSTALL" -eq 1 ]]; then
   # No --skip-install flag in install-local.sh; just run the build manually.
   if [[ "$SKIP_BUILD" -eq 0 ]]; then
@@ -63,7 +59,11 @@ if [[ "$SKIP_INSTALL" -eq 1 ]]; then
   fi
   exit 0
 fi
-./scripts/install-local.sh "${INSTALL_ARGS[@]}"
+if [[ "$SKIP_BUILD" -eq 1 ]]; then
+  ./scripts/install-local.sh --skip-build
+else
+  ./scripts/install-local.sh
+fi
 
 echo
 echo "✓ Refresh complete. Jass Code is launched with the latest upstream + your tweaks."
