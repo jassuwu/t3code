@@ -11,7 +11,7 @@ Personal tweaks on top of upstream `pingdotgg/t3code`. Living on the `personal` 
 
 ## Active tweaks
 
-_None yet._
+- **[local] rename app to Jass Code** — changes `APP_BASE_NAME` in `apps/desktop/src/appBranding.ts`. Propagates to window title, dock name, About panel, and the web UI's injected branding (via `apps/web/src/branding.ts` reading `injectedDesktopAppBranding.baseName`). Test at `apps/desktop/src/appBranding.test.ts` updated to match.
 
 <!--
 Example entry:
