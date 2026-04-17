@@ -8,9 +8,9 @@
 > **How it's structured:**
 > - `main` — clean mirror of `upstream/main`, never modified directly.
 > - `personal` — default working branch. Local tweaks live here as commits prefixed with `[local]`.
-> - Sync with upstream anytime via `./scripts/sync-upstream.sh` (fast-forwards `main`, rebases `personal`). On conflict you choose mine-vs-theirs per commit.
+> - Sync + rebuild + install in one shot: `./scripts/refresh.sh`. Conflict handling, per-step flags, and first-time setup live in [`WORKFLOW.md`](./WORKFLOW.md).
 >
-> See [`CHANGES.local.md`](./CHANGES.local.md) for the running list of local tweaks. Everything below is upstream's README, unchanged.
+> See [`CHANGES.local.md`](./CHANGES.local.md) for the running list of local tweaks and [`WORKFLOW.md`](./WORKFLOW.md) for the full workflow. Everything below is upstream's README, unchanged.
 >
 > ---
 
