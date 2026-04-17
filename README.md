@@ -1,5 +1,19 @@
 # T3 Code
 
+> [!NOTE]
+> **This is a personal fork of [`pingdotgg/t3code`](https://github.com/pingdotgg/t3code).**
+>
+> Upstream ships updates on its own cadence, so I maintain small local tweaks here without waiting. The goal is to stay as close to upstream as possible while keeping a few personal behavioral changes.
+>
+> **How it's structured:**
+> - `main` — clean mirror of `upstream/main`, never modified directly.
+> - `personal` — default working branch. Local tweaks live here as commits prefixed with `[local]`.
+> - Sync with upstream anytime via `./scripts/sync-upstream.sh` (fast-forwards `main`, rebases `personal`). On conflict you choose mine-vs-theirs per commit.
+>
+> See [`CHANGES.local.md`](./CHANGES.local.md) for the running list of local tweaks. Everything below is upstream's README, unchanged.
+>
+> ---
+
 T3 Code is a minimal web GUI for coding agents (currently Codex and Claude, more coming soon).
 
 ## Installation
