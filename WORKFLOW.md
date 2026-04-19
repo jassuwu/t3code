@@ -12,11 +12,11 @@ This doc is the single reference for how to work with this fork of `pingdotgg/t3
 
 ## Scripts you care about
 
-| Script | What it does |
-|---|---|
-| `scripts/sync-upstream.sh` | Fetch upstream, fast-forward `main`, rebase `personal`, push to fork. |
+| Script                     | What it does                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `scripts/sync-upstream.sh` | Fetch upstream, fast-forward `main`, rebase `personal`, push to fork.                                  |
 | `scripts/install-local.sh` | Build the macOS arm64 artifact and install it to `/Applications`, replacing the current installed app. |
-| `scripts/refresh.sh` | One-shot: runs `sync-upstream` then `install-local`. |
+| `scripts/refresh.sh`       | One-shot: runs `sync-upstream` then `install-local`.                                                   |
 
 All three live at the repo root under `scripts/`. All accept `--help`-like flags documented in their own headers.
 
@@ -29,6 +29,7 @@ All three live at the repo root under `scripts/`. All accept `--help`-like flags
 ```
 
 That's it. This:
+
 1. Fetches upstream, fast-forwards `main`, rebases `personal` onto `main`, pushes to your fork.
 2. Runs `bun run dist:desktop:dmg:arm64` (builds a fresh `.dmg` + `.zip` under `./release/`).
 3. Extracts `Jass Code (Alpha).app` from the zip, quits the running app, replaces `/Applications/Jass Code (Alpha).app`, clears macOS quarantine, relaunches.
@@ -107,7 +108,7 @@ bun install
 
 **Build fails on `turbo` cache errors:** `bun run clean && bun install && ./scripts/refresh.sh --skip-sync`.
 
-**Upstream changed something fundamental (e.g. build system rewrite):** read the upstream commit, then decide whether your tweak still applies. `CHANGES.local.md` tells you *why* each tweak exists so you can judge.
+**Upstream changed something fundamental (e.g. build system rewrite):** read the upstream commit, then decide whether your tweak still applies. `CHANGES.local.md` tells you _why_ each tweak exists so you can judge.
 
 ## Agent instructions
 

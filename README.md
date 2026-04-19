@@ -6,6 +6,7 @@
 > Upstream ships updates on its own cadence, so I maintain small local tweaks here without waiting. The goal is to stay as close to upstream as possible while keeping a few personal behavioral changes.
 >
 > **How it's structured:**
+>
 > - `main` — clean mirror of `upstream/main`, never modified directly.
 > - `personal` — default working branch. Local tweaks live here as commits prefixed with `[local]`.
 > - Sync + rebuild + install in one shot: `./scripts/refresh.sh`. Conflict handling, per-step flags, and first-time setup live in [`WORKFLOW.md`](./WORKFLOW.md).

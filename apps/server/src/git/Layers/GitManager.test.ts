@@ -277,7 +277,7 @@ function createTextGeneration(overrides: Partial<FakeGitTextGeneration> = {}): T
       Effect.succeed({
         subject: "Implement stacked git actions",
         body: "",
-        ...(input.includeBranch ? { branch: "feature/implement-stacked-git-actions" } : {}),
+        ...(input.includeBranch ? { branch: "feat/implement-stacked-git-actions" } : {}),
       }),
     generatePrContent: () =>
       Effect.succeed({
@@ -286,7 +286,7 @@ function createTextGeneration(overrides: Partial<FakeGitTextGeneration> = {}): T
       }),
     generateBranchName: () =>
       Effect.succeed({
-        branch: "update-workflow",
+        branch: "chore/update-workflow",
       }),
     generateThreadTitle: () =>
       Effect.succeed({
@@ -1309,7 +1309,7 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
               return {
                 subject: "this should not be used",
                 body: "",
-                ...(input.includeBranch ? { branch: "feature/unused" } : {}),
+                ...(input.includeBranch ? { branch: "chore/unused" } : {}),
               };
             }),
         },
@@ -1380,7 +1380,7 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
               return {
                 subject: "Implement stacked git actions",
                 body: "",
-                ...(input.includeBranch ? { branch: "feature/implement-stacked-git-actions" } : {}),
+                ...(input.includeBranch ? { branch: "feat/implement-stacked-git-actions" } : {}),
               };
             }),
         },
@@ -1392,7 +1392,7 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
       });
 
       expect(result.branch.status).toBe("created");
-      expect(result.branch.name).toBe("feature/implement-stacked-git-actions");
+      expect(result.branch.name).toBe("feat/implement-stacked-git-actions");
       expect(result.commit.status).toBe("created");
       expect(result.push.status).toBe("pushed");
       expect(result.toast).toMatchObject({
@@ -1406,13 +1406,13 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
         },
       });
       expect(result.toast.title).toMatch(
-        /^Pushed [0-9a-f]{7} to origin\/feature\/implement-stacked-git-actions$/,
+        /^Pushed [0-9a-f]{7} to origin\/feat\/implement-stacked-git-actions$/,
       );
       expect(
         yield* runGit(repoDir, ["rev-parse", "--abbrev-ref", "HEAD"]).pipe(
           Effect.map((result) => result.stdout.trim()),
         ),
-      ).toBe("feature/implement-stacked-git-actions");
+      ).toBe("feat/implement-stacked-git-actions");
 
       const mainSha = yield* runGit(repoDir, ["rev-parse", "main"]).pipe(
         Effect.map((r) => r.stdout.trim()),
@@ -1440,7 +1440,7 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
               return {
                 subject: "unused",
                 body: "",
-                ...(input.includeBranch ? { branch: "feature/unused" } : {}),
+                ...(input.includeBranch ? { branch: "chore/unused" } : {}),
               };
             }),
         },
@@ -1453,7 +1453,7 @@ it.layer(GitManagerTestLayer)("GitManager", (it) => {
       });
 
       expect(result.branch.status).toBe("created");
-      expect(result.branch.name).toBe("feature/feat-custom-summary-line");
+      expect(result.branch.name).toBe("feat/custom-summary-line");
       expect(result.commit.status).toBe("created");
       expect(result.commit.subject).toBe("feat: custom summary line");
       expect(generatedCount).toBe(0);

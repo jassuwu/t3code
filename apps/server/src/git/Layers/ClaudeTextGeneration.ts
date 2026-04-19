@@ -11,7 +11,7 @@ import { Effect, Option, Schema, Stream } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 import { type ClaudeSettings, type ModelSelection } from "@t3tools/contracts";
-import { sanitizeBranchFragment, sanitizeFeatureBranchName } from "@t3tools/shared/git";
+import { buildConventionalBranchName } from "@t3tools/shared/git";
 
 import { TextGenerationError } from "@t3tools/contracts";
 import { type TextGenerationShape } from "../Services/TextGeneration.ts";
@@ -242,8 +242,11 @@ export const makeClaudeTextGeneration = Effect.fn("makeClaudeTextGeneration")(fu
     return {
       subject: sanitizeCommitSubject(generated.subject),
       body: generated.body.trim(),
-      ...("branch" in generated && typeof generated.branch === "string"
-        ? { branch: sanitizeFeatureBranchName(generated.branch) }
+      ...("branchType" in generated &&
+      typeof generated.branchType === "string" &&
+      "branchName" in generated &&
+      typeof generated.branchName === "string"
+        ? { branch: buildConventionalBranchName(generated.branchType, generated.branchName) }
         : {}),
     };
   });
@@ -290,7 +293,7 @@ export const makeClaudeTextGeneration = Effect.fn("makeClaudeTextGeneration")(fu
     });
 
     return {
-      branch: sanitizeBranchFragment(generated.branch),
+      branch: buildConventionalBranchName(generated.type, generated.name),
     };
   });
 

@@ -177,7 +177,7 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
             "  Add important change to the system with too much detail and a trailing period.\nsecondary line",
           body: "\n- added migration\n- updated tests\n",
         }),
-        stdinMustNotContain: "branch must be a short semantic git branch fragment",
+        stdinMustNotContain: "branchName describes the change",
       },
       (textGeneration) =>
         Effect.gen(function* () {
@@ -208,7 +208,7 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
           }),
           requireFastServiceTier: true,
           requireReasoningEffort: "xhigh",
-          stdinMustNotContain: "branch must be a short semantic git branch fragment",
+          stdinMustNotContain: "branchName describes the change",
         },
         (textGeneration) =>
           textGeneration.generateCommitMessage({
@@ -250,9 +250,10 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
         output: JSON.stringify({
           subject: "Add important change",
           body: "",
-          branch: "fix/important-system-change",
+          branchType: "fix",
+          branchName: "important-system-change",
         }),
-        stdinMustContain: "branch must be a short semantic git branch fragment",
+        stdinMustContain: "branchName describes the change",
       },
       (textGeneration) =>
         Effect.gen(function* () {
@@ -266,7 +267,7 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
           });
 
           expect(generated.subject).toBe("Add important change");
-          expect(generated.branch).toBe("feature/fix/important-system-change");
+          expect(generated.branch).toBe("fix/important-system-change");
         }),
     ),
   );
@@ -302,7 +303,8 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
     withFakeCodexEnv(
       {
         output: JSON.stringify({
-          branch: "  Feat/Session  ",
+          type: "feat",
+          name: "  Session  ",
         }),
         stdinMustNotContain: "Image attachments supplied to the model",
       },
@@ -384,7 +386,8 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
     withFakeCodexEnv(
       {
         output: JSON.stringify({
-          branch: "fix/session-timeout",
+          type: "fix",
+          name: "session-timeout",
         }),
         stdinMustNotContain: "Attachment metadata:",
       },
@@ -405,7 +408,8 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
     withFakeCodexEnv(
       {
         output: JSON.stringify({
-          branch: "fix/ui-regression",
+          type: "fix",
+          name: "ui-regression",
         }),
         requireImage: true,
         stdinMustContain: "Attachment metadata:",
@@ -444,7 +448,8 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
     withFakeCodexEnv(
       {
         output: JSON.stringify({
-          branch: "fix/ui-regression",
+          type: "fix",
+          name: "ui-regression",
         }),
         requireImage: true,
       },
@@ -493,7 +498,8 @@ it.layer(CodexTextGenerationTestLayer)("CodexTextGenerationLive", (it) => {
     withFakeCodexEnv(
       {
         output: JSON.stringify({
-          branch: "fix/ui-regression",
+          type: "fix",
+          name: "ui-regression",
         }),
         requireImage: true,
       },

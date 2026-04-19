@@ -4,7 +4,7 @@ import {
   buildGitActionProgressStages,
   buildMenuItems,
   requiresDefaultBranchConfirmation,
-  resolveAutoFeatureBranchName,
+  resolveAutoConventionalBranchName,
   resolveDefaultBranchActionDialogCopy,
   resolveLiveThreadBranchUpdate,
   resolveQuickAction,
@@ -1031,32 +1031,32 @@ describe("resolveLiveThreadBranchUpdate", () => {
   });
 });
 
-describe("resolveAutoFeatureBranchName", () => {
-  it("uses semantic preferred branch names when available", () => {
-    const branch = resolveAutoFeatureBranchName(["main", "feature/other"], "fix toast copy");
-    assert.equal(branch, "feature/fix-toast-copy");
+describe("resolveAutoConventionalBranchName", () => {
+  it("defaults unknown preferred names to chore/<slug>", () => {
+    const branch = resolveAutoConventionalBranchName(["main", "fix/other"], "fix toast copy");
+    assert.equal(branch, "chore/fix-toast-copy");
   });
 
-  it("normalizes preferred names that already include a branch namespace", () => {
-    const branch = resolveAutoFeatureBranchName(["main"], "feature/refine-toolbar-actions");
-    assert.equal(branch, "feature/refine-toolbar-actions");
+  it("preserves a valid conventional namespace in the preferred name", () => {
+    const branch = resolveAutoConventionalBranchName(["main"], "fix/refine-toolbar-actions");
+    assert.equal(branch, "fix/refine-toolbar-actions");
   });
 
   it("increments suffix when the preferred branch name already exists", () => {
-    const branch = resolveAutoFeatureBranchName(
-      ["main", "feature/fix-toast-copy", "feature/fix-toast-copy-2"],
-      "fix toast copy",
+    const branch = resolveAutoConventionalBranchName(
+      ["main", "fix/toast-copy", "fix/toast-copy-2"],
+      "fix/toast-copy",
     );
-    assert.equal(branch, "feature/fix-toast-copy-3");
+    assert.equal(branch, "fix/toast-copy-3");
   });
 
   it("treats existing branch names as case-insensitive for collision checks", () => {
-    const branch = resolveAutoFeatureBranchName(["Feature/Ticket-1"], "feature/ticket-1");
-    assert.equal(branch, "feature/ticket-1-2");
+    const branch = resolveAutoConventionalBranchName(["Feat/Ticket-1"], "feat/ticket-1");
+    assert.equal(branch, "feat/ticket-1-2");
   });
 
-  it("falls back to feature/update when no preferred name is provided", () => {
-    const branch = resolveAutoFeatureBranchName(["main"]);
-    assert.equal(branch, "feature/update");
+  it("falls back to chore/update when no preferred name is provided", () => {
+    const branch = resolveAutoConventionalBranchName(["main"]);
+    assert.equal(branch, "chore/update");
   });
 });

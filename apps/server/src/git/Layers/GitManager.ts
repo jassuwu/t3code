@@ -26,9 +26,9 @@ import {
 import {
   detectGitHostingProviderFromRemoteUrl,
   mergeGitStatusParts,
-  resolveAutoFeatureBranchName,
+  resolveAutoConventionalBranchName,
   sanitizeBranchFragment,
-  sanitizeFeatureBranchName,
+  sanitizeConventionalBranchName,
 } from "@t3tools/shared/git";
 
 import { GitManagerError } from "@t3tools/contracts";
@@ -1060,7 +1060,7 @@ export const makeGitManager = Effect.fn("makeGitManager")(function* () {
           subject: customCommit.subject,
           body: customCommit.body,
           ...(input.includeBranch
-            ? { branch: sanitizeFeatureBranchName(customCommit.subject) }
+            ? { branch: sanitizeConventionalBranchName(customCommit.subject) }
             : {}),
           commitMessage: formatCommitMessage(customCommit.subject, customCommit.body),
         };
@@ -1525,9 +1525,9 @@ export const makeGitManager = Effect.fn("makeGitManager")(function* () {
       );
     }
 
-    const preferredBranch = suggestion.branch ?? sanitizeFeatureBranchName(suggestion.subject);
+    const preferredBranch = suggestion.branch ?? sanitizeConventionalBranchName(suggestion.subject);
     const existingBranchNames = yield* gitCore.listLocalBranchNames(cwd);
-    const resolvedBranch = resolveAutoFeatureBranchName(existingBranchNames, preferredBranch);
+    const resolvedBranch = resolveAutoConventionalBranchName(existingBranchNames, preferredBranch);
 
     yield* gitCore.createBranch({ cwd, branch: resolvedBranch });
     yield* Effect.scoped(gitCore.checkoutBranch({ cwd, branch: resolvedBranch }));

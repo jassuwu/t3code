@@ -7,7 +7,7 @@ import {
   type ModelSelection,
   type OpenCodeSettings,
 } from "@t3tools/contracts";
-import { sanitizeBranchFragment, sanitizeFeatureBranchName } from "@t3tools/shared/git";
+import { buildConventionalBranchName } from "@t3tools/shared/git";
 import { getModelSelectionStringOptionValue } from "@t3tools/shared/model";
 
 import { ServerConfig } from "../../config.ts";
@@ -383,8 +383,11 @@ export const makeOpenCodeTextGeneration = Effect.fn("makeOpenCodeTextGeneration"
     return {
       subject: sanitizeCommitSubject(generated.subject),
       body: generated.body.trim(),
-      ...("branch" in generated && typeof generated.branch === "string"
-        ? { branch: sanitizeFeatureBranchName(generated.branch) }
+      ...("branchType" in generated &&
+      typeof generated.branchType === "string" &&
+      "branchName" in generated &&
+      typeof generated.branchName === "string"
+        ? { branch: buildConventionalBranchName(generated.branchType, generated.branchName) }
         : {}),
     };
   });
@@ -430,7 +433,7 @@ export const makeOpenCodeTextGeneration = Effect.fn("makeOpenCodeTextGeneration"
     });
 
     return {
-      branch: sanitizeBranchFragment(generated.branch),
+      branch: buildConventionalBranchName(generated.type, generated.name),
     };
   });
 
