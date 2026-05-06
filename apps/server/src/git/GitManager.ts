@@ -35,9 +35,9 @@ import {
 import {
   detectSourceControlProviderFromGitRemoteUrl,
   mergeGitStatusParts,
-  resolveAutoFeatureBranchName,
+  resolveAutoConventionalBranchName,
   sanitizeBranchFragment,
-  sanitizeFeatureBranchName,
+  sanitizeConventionalBranchName,
 } from "@t3tools/shared/git";
 import {
   getChangeRequestTerminologyForKind,
@@ -1106,7 +1106,7 @@ export const makeGitManager = Effect.fn("makeGitManager")(function* () {
           subject: customCommit.subject,
           body: customCommit.body,
           ...(input.includeBranch
-            ? { branch: sanitizeFeatureBranchName(customCommit.subject) }
+            ? { branch: sanitizeConventionalBranchName(customCommit.subject) }
             : {}),
           commitMessage: formatCommitMessage(customCommit.subject, customCommit.body),
         };
@@ -1577,9 +1577,9 @@ export const makeGitManager = Effect.fn("makeGitManager")(function* () {
       );
     }
 
-    const preferredBranch = suggestion.branch ?? sanitizeFeatureBranchName(suggestion.subject);
+    const preferredBranch = suggestion.branch ?? sanitizeConventionalBranchName(suggestion.subject);
     const existingBranchNames = yield* gitCore.listLocalBranchNames(cwd);
-    const resolvedBranch = resolveAutoFeatureBranchName(existingBranchNames, preferredBranch);
+    const resolvedBranch = resolveAutoConventionalBranchName(existingBranchNames, preferredBranch);
 
     yield* gitCore.createRef({ cwd, refName: resolvedBranch });
     yield* Effect.scoped(gitCore.switchRef({ cwd, refName: resolvedBranch }));

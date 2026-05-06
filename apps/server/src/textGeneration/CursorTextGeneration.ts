@@ -2,7 +2,7 @@ import { Effect, Option, Ref, Schema } from "effect";
 import { ChildProcessSpawner } from "effect/unstable/process";
 
 import { type CursorSettings, type ModelSelection } from "@t3tools/contracts";
-import { sanitizeBranchFragment, sanitizeFeatureBranchName } from "@t3tools/shared/git";
+import { buildConventionalBranchName } from "@t3tools/shared/git";
 
 import { TextGenerationError } from "@t3tools/contracts";
 import { type ThreadTitleGenerationResult, type TextGenerationShape } from "./TextGeneration.ts";
@@ -194,8 +194,11 @@ export const makeCursorTextGeneration = Effect.fn("makeCursorTextGeneration")(fu
     return {
       subject: sanitizeCommitSubject(generated.subject),
       body: generated.body.trim(),
-      ...("branch" in generated && typeof generated.branch === "string"
-        ? { branch: sanitizeFeatureBranchName(generated.branch) }
+      ...("branchType" in generated &&
+      typeof generated.branchType === "string" &&
+      "branchName" in generated &&
+      typeof generated.branchName === "string"
+        ? { branch: buildConventionalBranchName(generated.branchType, generated.branchName) }
         : {}),
     };
   });
@@ -242,7 +245,7 @@ export const makeCursorTextGeneration = Effect.fn("makeCursorTextGeneration")(fu
     });
 
     return {
-      branch: sanitizeBranchFragment(generated.branch),
+      branch: buildConventionalBranchName(generated.type, generated.name),
     };
   });
 

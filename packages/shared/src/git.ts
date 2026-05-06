@@ -14,7 +14,37 @@ export const WORKTREE_BRANCH_PREFIX = "t3code";
 const TEMP_WORKTREE_BRANCH_PATTERN = new RegExp(`^${WORKTREE_BRANCH_PREFIX}\\/[0-9a-f]{8}$`);
 
 /**
- * Sanitize an arbitrary string into a valid, lowercase git refName fragment.
+ * Conventional-commit-style branch types. The first segment of every
+ * generated branch name must be one of these.
+ */
+export const CONVENTIONAL_BRANCH_TYPES = [
+  "feat",
+  "fix",
+  "hotfix",
+  "refactor",
+  "chore",
+  "docs",
+  "test",
+  "perf",
+  "build",
+  "ci",
+  "revert",
+] as const;
+export type ConventionalBranchType = (typeof CONVENTIONAL_BRANCH_TYPES)[number];
+
+const CONVENTIONAL_BRANCH_TYPES_SET: ReadonlySet<string> = new Set(CONVENTIONAL_BRANCH_TYPES);
+
+/**
+ * Default type used when an input lacks a recognizable conventional prefix.
+ */
+export const DEFAULT_CONVENTIONAL_BRANCH_TYPE: ConventionalBranchType = "chore";
+
+export function isConventionalBranchType(value: string): value is ConventionalBranchType {
+  return CONVENTIONAL_BRANCH_TYPES_SET.has(value);
+}
+
+/**
+ * Sanitize an arbitrary string into a valid, lowercase git branch fragment.
  * Strips quotes, collapses separators, limits to 64 chars.
  */
 export function sanitizeBranchFragment(raw: string): string {
@@ -36,32 +66,61 @@ export function sanitizeBranchFragment(raw: string): string {
 }
 
 /**
- * Sanitize a string into a `feature/…` refName name.
- * Preserves an existing `feature/` prefix or slash-separated namespace.
+ * Build a conventional `<type>/<name>` branch name from a type hint and a raw
+ * name fragment. Falls back to `chore` when `type` is not a known
+ * conventional type.
  */
-export function sanitizeFeatureBranchName(raw: string): string {
-  const sanitized = sanitizeBranchFragment(raw);
-  if (sanitized.includes("/")) {
-    return sanitized.startsWith("feature/") ? sanitized : `feature/${sanitized}`;
-  }
-  return `feature/${sanitized}`;
+export function buildConventionalBranchName(type: string, rawName: string): string {
+  const normalizedType = type.trim().toLowerCase();
+  const resolvedType: ConventionalBranchType = isConventionalBranchType(normalizedType)
+    ? normalizedType
+    : DEFAULT_CONVENTIONAL_BRANCH_TYPE;
+  return `${resolvedType}/${sanitizeBranchFragment(rawName)}`;
 }
 
-const AUTO_FEATURE_BRANCH_FALLBACK = "feature/update";
+/**
+ * Normalize an already-assembled branch-ish string into a valid
+ * `<type>/<name>` form. Supports two leading-type syntaxes:
+ *   - `<type>/<rest>` (branch-like input)
+ *   - `<type>: <rest>` / `<type>(scope)!: <rest>` (conventional-commit subject)
+ * If the input lacks a recognized conventional type prefix, the default type
+ * (`chore`) is prepended.
+ */
+export function sanitizeConventionalBranchName(raw: string): string {
+  const trimmed = raw.trim();
+  const conventionalCommitMatch = /^([a-z]+)(?:\([^)]*\))?!?:\s*(.+)$/i.exec(trimmed);
+  const normalized =
+    conventionalCommitMatch && conventionalCommitMatch[1] && conventionalCommitMatch[2]
+      ? `${conventionalCommitMatch[1]}/${conventionalCommitMatch[2]}`
+      : trimmed;
+  const sanitized = sanitizeBranchFragment(normalized);
+  const slashIndex = sanitized.indexOf("/");
+  if (slashIndex > 0) {
+    const maybeType = sanitized.slice(0, slashIndex);
+    const rest = sanitized.slice(slashIndex + 1);
+    if (isConventionalBranchType(maybeType) && rest.length > 0) {
+      return `${maybeType}/${rest}`;
+    }
+  }
+  return `${DEFAULT_CONVENTIONAL_BRANCH_TYPE}/${sanitized}`;
+}
+
+const AUTO_CONVENTIONAL_BRANCH_FALLBACK = `${DEFAULT_CONVENTIONAL_BRANCH_TYPE}/update`;
 
 /**
- * Resolve a unique `feature/…` refName name that doesn't collide with
- * any existing refName. Appends a numeric suffix when needed.
+ * Resolve a unique conventional `<type>/<name>` branch name that doesn't
+ * collide with any existing branch. Appends a numeric suffix when needed.
  */
-export function resolveAutoFeatureBranchName(
+export function resolveAutoConventionalBranchName(
   existingBranchNames: readonly string[],
   preferredBranch?: string,
 ): string {
   const preferred = preferredBranch?.trim();
-  const resolvedBase = sanitizeFeatureBranchName(
-    preferred && preferred.length > 0 ? preferred : AUTO_FEATURE_BRANCH_FALLBACK,
-  );
-  const existingNames = new Set(existingBranchNames.map((refName) => refName.toLowerCase()));
+  const resolvedBase =
+    preferred && preferred.length > 0
+      ? sanitizeConventionalBranchName(preferred)
+      : AUTO_CONVENTIONAL_BRANCH_FALLBACK;
+  const existingNames = new Set(existingBranchNames.map((branch) => branch.toLowerCase()));
 
   if (!existingNames.has(resolvedBase)) {
     return resolvedBase;

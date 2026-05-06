@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   applyGitStatusStreamEvent,
+  buildConventionalBranchName,
   buildTemporaryWorktreeBranchName,
   isTemporaryWorktreeBranch,
   normalizeGitRemoteUrl,
   parseGitHubRepositoryNameWithOwnerFromRemoteUrl,
+  resolveAutoConventionalBranchName,
+  sanitizeConventionalBranchName,
   WORKTREE_BRANCH_PREFIX,
 } from "./git.ts";
 
@@ -68,6 +71,63 @@ describe("isTemporaryWorktreeBranch", () => {
     expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/feature/demo`)).toBe(false);
     expect(isTemporaryWorktreeBranch("main")).toBe(false);
     expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/deadbeef-extra`)).toBe(false);
+  });
+});
+
+describe("buildConventionalBranchName", () => {
+  it("assembles <type>/<name> with a valid conventional type", () => {
+    expect(buildConventionalBranchName("feat", "Add login page")).toBe("feat/add-login-page");
+    expect(buildConventionalBranchName("FIX", "  Broken reconnect  ")).toBe("fix/broken-reconnect");
+    expect(buildConventionalBranchName("hotfix", "patch cve")).toBe("hotfix/patch-cve");
+  });
+
+  it("falls back to chore/ when the type is not recognized", () => {
+    expect(buildConventionalBranchName("feature", "update")).toBe("chore/update");
+    expect(buildConventionalBranchName("", "something")).toBe("chore/something");
+    expect(buildConventionalBranchName("nonsense", "thing")).toBe("chore/thing");
+  });
+});
+
+describe("sanitizeConventionalBranchName", () => {
+  it("preserves a valid <type>/<name> input", () => {
+    expect(sanitizeConventionalBranchName("feat/add-login")).toBe("feat/add-login");
+    expect(sanitizeConventionalBranchName("  Fix/Broken Reconnect  ")).toBe("fix/broken-reconnect");
+  });
+
+  it("extracts the conventional type from a conventional-commit subject", () => {
+    expect(sanitizeConventionalBranchName("feat: custom summary line")).toBe(
+      "feat/custom-summary-line",
+    );
+    expect(sanitizeConventionalBranchName("fix(auth)!: refresh token flow")).toBe(
+      "fix/refresh-token-flow",
+    );
+  });
+
+  it("prepends chore/ when no recognized type is present", () => {
+    expect(sanitizeConventionalBranchName("feature/update-workflow")).toBe(
+      "chore/feature/update-workflow",
+    );
+    expect(sanitizeConventionalBranchName("just a description")).toBe("chore/just-a-description");
+  });
+});
+
+describe("resolveAutoConventionalBranchName", () => {
+  it("returns the sanitized preferred branch when it does not collide", () => {
+    expect(resolveAutoConventionalBranchName([], "feat/add-login")).toBe("feat/add-login");
+    expect(resolveAutoConventionalBranchName(["main"], "fix/foo")).toBe("fix/foo");
+  });
+
+  it("falls back to chore/update when no preferred branch is supplied", () => {
+    expect(resolveAutoConventionalBranchName([])).toBe("chore/update");
+  });
+
+  it("appends a numeric suffix on collision", () => {
+    expect(resolveAutoConventionalBranchName(["feat/add-login"], "feat/add-login")).toBe(
+      "feat/add-login-2",
+    );
+    expect(
+      resolveAutoConventionalBranchName(["feat/add-login", "feat/add-login-2"], "feat/add-login"),
+    ).toBe("feat/add-login-3");
   });
 });
 
